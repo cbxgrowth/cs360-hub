@@ -1,0 +1,288 @@
+
+#root {
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+  min-height: 100vh;
+}
+
+/* Enhanced Custom Scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-slate-600 {
+  scrollbar-color: rgb(71 85 105) transparent;
+}
+
+.scrollbar-track-transparent {
+  scrollbar-color: rgb(71 85 105) transparent;
+}
+
+/* Beautiful Custom Scrollbar for Webkit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 8px rgba(124, 58, 237, 0.4);
+  transform: scale(1.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 50%, #4c1d95 100%);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 12px rgba(59, 130, 246, 0.5);
+}
+
+/* Sidebar specific enhanced scrollbar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 2px;
+  margin: 4px 0;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, 
+    rgba(124, 58, 237, 0.8) 0%, 
+    rgba(109, 40, 217, 0.9) 50%, 
+    rgba(91, 33, 182, 1) 100%
+  );
+  border-radius: 2px;
+  border: none;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 6px rgba(124, 58, 237, 0.3);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, 
+    rgba(147, 51, 234, 0.9) 0%, 
+    rgba(126, 34, 206, 1) 50%, 
+    rgba(107, 33, 168, 1) 100%
+  );
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 10px rgba(147, 51, 234, 0.6),
+    0 0 20px rgba(147, 51, 234, 0.3);
+}
+
+/* Super Admin specific scrollbar */
+.super-admin-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #dc2626, #b91c1c);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.super-admin-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #b91c1c, #991b1b);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+/* Enhanced animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(34, 197, 94, 0.8), 0 0 50px rgba(34, 197, 94, 0.3); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Glass morphism effects */
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Chart enhancements */
+.recharts-wrapper {
+  font-family: inherit;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  opacity: 0.3;
+}
+
+.recharts-tooltip-wrapper {
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1));
+}
+
+/* Button hover effects */
+.btn-gradient-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gradient-hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.btn-gradient-hover:hover::before {
+  left: 100%;
+}
+
+/* Sidebar responsive adjustments */
+.peer[data-state="collapsed"] ~ main {
+  margin-left: 5rem;
+}
+
+.peer[data-state="expanded"] ~ main {
+  margin-left: 18rem;
+}
+
+/* Desktop adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .peer[data-state="collapsed"] ~ main,
+  .peer[data-state="expanded"] ~ main {
+    margin-left: 5rem;
+  }
+}
+
+/* Mobile adjustments - sidebar overlay mode */
+@media (max-width: 768px) {
+  .peer[data-state="collapsed"] ~ main,
+  .peer[data-state="expanded"] ~ main {
+    margin-left: 0 !important;
+  }
+  
+  .peer-data-[state=collapsed]:ml-20,
+  .peer-data-[state=expanded]:ml-72,
+  .ml-72 {
+    margin-left: 0 !important;
+  }
+}
+
+/* Mobile sidebar overlay */
+@media (max-width: 768px) {
+  .sidebar-mobile-overlay {
+    z-index: 60;
+  }
+}
+
+/* Super Admin theme enhancements */
+.super-admin-gradient {
+  background: linear-gradient(135deg, #fee2e2 0%, #fed7aa 50%, #fef3c7 100%);
+}
+
+.dark .super-admin-gradient {
+  background: linear-gradient(135deg, #374151 0%, #1f2937 50%, #111827 100%);
+}
+
+/* Card hover effects for Super Admin */
+.super-admin-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.super-admin-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(220, 38, 38, 0.1), 0 10px 10px -5px rgba(220, 38, 38, 0.04);
+}
+
+/* Status indicators */
+.status-indicator {
+  position: relative;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px #ffffff;
+  animation: pulse-glow 2s infinite;
+}
+
+.status-indicator.warning::before {
+  background: #f59e0b;
+}
+
+.status-indicator.error::before {
+  background: #ef4444;
+}
