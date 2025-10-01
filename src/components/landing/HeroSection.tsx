@@ -81,6 +81,22 @@ export const HeroSection = () => {
               </div>
             ))}
           </div>
+
+          {/* Payment Security Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-4 text-blue-200 animate-fade-in" style={{ animationDelay: '1s' }}>
+            <div className="flex items-center text-xs md:text-sm">
+              <Shield className="w-3 h-3 md:w-4 md:h-4 text-green-400 mr-1.5" />
+              <span className="font-medium">Pagamento 100% Seguro</span>
+            </div>
+            <div className="flex items-center text-xs md:text-sm">
+              <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-400 mr-1.5" />
+              <span className="font-medium">Cancele Quando Quiser</span>
+            </div>
+            <div className="flex items-center text-xs md:text-sm">
+              <Award className="w-3 h-3 md:w-4 md:h-4 text-green-400 mr-1.5" />
+              <span className="font-medium">30 Dias de Garantia</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

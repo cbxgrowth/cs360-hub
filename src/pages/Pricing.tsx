@@ -4,6 +4,7 @@ import { ROICalculatorModal } from '../components/ROICalculatorModal';
 import { PricingHeader } from '../components/pricing/PricingHeader';
 import { PricingPlans } from '../components/pricing/PricingPlans';
 import { PricingAddOns } from '../components/pricing/PricingAddOns';
+import { PricingPaymentInfo } from '../components/pricing/PricingPaymentInfo';
 import { PricingROI } from '../components/pricing/PricingROI';
 import { PricingFAQ } from '../components/pricing/PricingFAQ';
 import { PricingCTA } from '../components/pricing/PricingCTA';
@@ -15,6 +16,7 @@ const Pricing = () => {
         <PricingHeader isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
         <PricingPlans isAnnual={isAnnual} />
         <PricingAddOns />
+        <PricingPaymentInfo />
         <PricingROI onOpenROIModal={() => setIsROIModalOpen(true)} />
         <PricingFAQ />
         <PricingCTA />

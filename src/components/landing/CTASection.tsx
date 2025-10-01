@@ -52,7 +52,7 @@ export const CTASection = () => {
         </div>
 
         {/* Executive Final Benefits */}
-        <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6 text-blue-200">
+        <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6 text-blue-200 mb-8">
           <div className="flex items-center bg-white/15 backdrop-blur-md rounded-full px-4 py-2 hover:bg-white/20 transition-all duration-300">
             <CheckCircle className="w-4 h-4 mr-2" />
             <span className="font-semibold text-sm lg:text-base">Success Manager Dedicado</span>
@@ -64,6 +64,25 @@ export const CTASection = () => {
           <div className="flex items-center bg-white/15 backdrop-blur-md rounded-full px-4 py-2 hover:bg-white/20 transition-all duration-300">
             <Crown className="w-4 h-4 mr-2" />
             <span className="font-semibold text-sm lg:text-base">Suporte C-Level 24/7</span>
+          </div>
+        </div>
+
+        {/* Payment Security Badges */}
+        <div className="pt-8 border-t border-white/20">
+          <p className="text-blue-200 mb-4 text-sm font-medium">Pagamento 100% Seguro</p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Badge variant="outline" className="bg-white/10 border-white/30 text-white px-4 py-2 backdrop-blur-md">
+              <Shield className="w-4 h-4 mr-2" />
+              Pagamento Seguro
+            </Badge>
+            <Badge variant="outline" className="bg-white/10 border-white/30 text-white px-4 py-2 backdrop-blur-md">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Cancele Quando Quiser
+            </Badge>
+            <Badge variant="outline" className="bg-white/10 border-white/30 text-white px-4 py-2 backdrop-blur-md">
+              <Shield className="w-4 h-4 mr-2" />
+              30 Dias de Garantia
+            </Badge>
           </div>
         </div>
       </div>

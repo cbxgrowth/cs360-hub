@@ -4,70 +4,83 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Progress } from '../ui/progress';
-import { CreditCard, Download, Calendar, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { CreditCard, Download, Calendar, AlertCircle, CheckCircle, Clock, Zap } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
-import { supabase } from "@/integrations/supabase/client";
-import { withRetry, retryConditions } from '@/utils/retry';
-import { logger } from '@/utils/logger';
-import { LoadingSpinner } from '../common/LoadingSpinner';
+import { UpgradePlanModal } from '../billing/UpgradePlanModal';
+import { PurchaseCreditsModal } from '../billing/PurchaseCreditsModal';
 
 const plans = [
   {
     name: 'Starter',
-    price: 279,
+    price: 299,
     description: 'Ideal para pequenas equipes de CS',
     features: [
-      'Até 30 clientes',
-      '2 usuários na equipe',
-      'Gestão de clientes',
-      'Registro de serviços e contratos',
-      'Upsell e CrossSell',
-      'Alertas e recomendações IA',
-      'Suporte por e-mail',
-      '10 Cré1ditos IA'
+      'Até 50 clientes ativos',
+      '1 usuário incluído (+R$ 99/usuário extra)',
+      'Dashboard básico com métricas essenciais',
+      'NPS automático mensal',
+      'Health Score básico',
+      'Relatórios pré-definidos (10)',
+      'Suporte via email (48h)',
+      'Integrações básicas (5)',
+      'Onboarding guiado (2h)',
+      'Armazenamento 5GB',
+      'Histórico de 6 meses',
+      '10 Créditos IA por mês'
     ],
-    limits: { clients: 30, users: 2, aiCredits: 10 },
+    limits: { clients: 50, users: 1, aiCredits: 10 },
     popular: false
   },
   {
     name: 'Professional',
-    price: 497,
+    price: 799,
     description: 'Para equipes em crescimento',
     features: [
-      'Até 80 clientes',
-      '5 usuários na equipe',
-      'Gestão de Clientes',
-      'Gestão de Contratos',
-      'Alertas de oportunidades e recomendações IA',
-      'Upsell e CrossSell',
-      'Relatórios avançados',
-      'Integração com CRMs',
-      'Suporte prioritário',
-      'Sistema de Medição e Gestão do NPS',
-      'Relatórios e Dashboards Personalizados',
-      '50 Créditos IA'
+      'Até 150 clientes ativos',
+      '5 usuários incluídos (+R$ 79/usuário extra)',
+      'Dashboard avançado com IA',
+      'Automações inteligentes ilimitadas',
+      'Health Score com IA preditiva (85% precisão)',
+      'NPS trimestral + CSAT + CES',
+      'Relatórios personalizáveis (50+)',
+      'Integrações avançadas (20+)',
+      'API básica (1000 req/hora)',
+      'Suporte prioritário (24h)',
+      'Treinamento online (10h)',
+      'Armazenamento 50GB',
+      'Histórico de 2 anos',
+      'Alertas inteligentes',
+      'Segmentação automática',
+      '30 Créditos IA por mês'
     ],
-    limits: { clients: 80, users: 5, aiCredits: 50 },
+    limits: { clients: 150, users: 5, aiCredits: 30 },
     popular: true
   },
   {
     name: 'Growth',
-    price: 997,
+    price: 1599,
     description: 'Para empresas em aceleração',
     features: [
-      '150 Clientes',
-      'Todos os usuários da equipe',
-      'Funcionalidades personalizadas',
-      'Integração com CRMs e APIs',
-      'Gestão e Acompanhamento do LTV e CAC',
-      'Gestão de Estratégias e Ações',
-      'Automação, Alertas e Insights com IA',
-      'Relatórios e Dashboards Personalizados',
-      'API completa',
-      'Treinamento especializado',
-      '100 Créditos IA'
+      'Até 500 clientes ativos',
+      '15 usuários incluídos (+R$ 59/usuário extra)',
+      'IA preditiva avançada (95% precisão)',
+      'Programa de parceiros incluso',
+      'Análise de sentimento avançada',
+      'Automações com machine learning',
+      'API completa (10.000 req/hora)',
+      'Integrações ilimitadas',
+      'CSM dedicado (4h/mês)',
+      'Treinamento presencial (20h)',
+      'SLA de 4 horas',
+      'Armazenamento 200GB',
+      'Histórico ilimitado',
+      'Customizações básicas',
+      'Consultoria mensal (2h)',
+      'Backup automático',
+      'Relatórios executivos',
+      '50 Créditos IA por mês'
     ],
-    limits: { clients: 150, users: 999, aiCredits: 100 },
+    limits: { clients: 500, users: 15, aiCredits: 50 },
     popular: false
   },
   {
@@ -76,16 +89,27 @@ const plans = [
     description: 'Para grandes empresas',
     features: [
       'Clientes ilimitados',
-      'Funcionalidades personalizadas',
-      'Integrações personalizadas',
-      'API completa',
-      'Multi-usuários',
-      'Suporte 24/7',
-      'Treinamento especializado',
-      'Testes personalizados',
-      '300 Créditos IA'
+      'Usuários ilimitados',
+      'Infraestrutura dedicada na AWS',
+      'IA personalizada para seu negócio',
+      'Customizações completas',
+      'Implementação guiada completa (80h)',
+      'Consultoria estratégica inclusa (10h/mês)',
+      'Treinamento da equipe (40h)',
+      'API enterprise (100.000 req/hora)',
+      'SLA de 1 hora garantido',
+      'Suporte 24/7/365',
+      'Success Manager exclusivo',
+      'Roadmap personalizado',
+      'Integração customizada ilimitada',
+      'Compliance total (SOX, HIPAA)',
+      'Backup em tempo real',
+      'Disaster recovery',
+      'Auditoria de segurança',
+      'Onboarding premium (6 meses)',
+      'Créditos IA ilimitados'
     ],
-    limits: { clients: 999999, users: 999999, aiCredits: 300 },
+    limits: { clients: 999999, users: 999999, aiCredits: -1 },
     popular: false
   }
 ];
@@ -98,14 +122,14 @@ const invoices = [
 
 export const BillingManagementEnhanced = () => {
   const [currentPlan] = useState('Professional');
-  const [usage] = useState({
+  const [usage, setUsage] = useState({
     clients: 45,
     users: 3,
     aiCredits: 28
   });
-  const [portalLoading, setPortalLoading] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'error' | 'checking'>('connected');
-  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
+  const { showSuccess, showInfo } = useNotifications();
 
   const getCurrentPlanData = () => {
     return plans.find(p => p.name === currentPlan) || plans[1];
@@ -113,48 +137,19 @@ export const BillingManagementEnhanced = () => {
 
   const planData = getCurrentPlanData();
 
-  const openStripePortal = async () => {
-    setPortalLoading(true);
-    setConnectionStatus('checking');
-    
-    try {
-      logger.info('Abrindo portal do Stripe');
-      
-      const result = await withRetry(
-        async () => {
-          const { data, error } = await supabase.functions.invoke('customer-portal');
-          if (error) throw error;
-          if (!data?.url) throw new Error('URL do portal não retornada');
-          return data;
-        },
-        {
-          maxAttempts: 3,
-          delay: 1000,
-          retryCondition: retryConditions.temporaryError
-        }
-      );
-      
-      setConnectionStatus('connected');
-      logger.info('Portal do Stripe aberto com sucesso');
-      
-      showSuccess({
-        title: "Redirecionando para o portal",
-        description: "Você será redirecionado para gerenciar sua assinatura."
-      });
-      
-      window.open(result.url, '_blank');
-      
-    } catch (err: any) {
-      setConnectionStatus('error');
-      logger.error('Erro ao abrir portal do Stripe', err);
-      
-      showError({
-        title: "Erro ao acessar portal de pagamento",
-        description: err.message || "Tente novamente em alguns instantes ou entre em contato com o suporte."
-      });
-    } finally {
-      setPortalLoading(false);
-    }
+  const handleUpgradeSuccess = () => {
+    showSuccess({
+      title: "Plano Atualizado!",
+      description: "Seu plano foi atualizado com sucesso."
+    });
+  };
+
+  const handleCreditsSuccess = () => {
+    setUsage(prev => ({ ...prev, aiCredits: prev.aiCredits + 50 }));
+    showSuccess({
+      title: "Créditos Adicionados!",
+      description: "Seus créditos de IA foram adicionados com sucesso."
+    });
   };
 
   const getUsageColor = (current: number, limit: number) => {
@@ -164,46 +159,9 @@ export const BillingManagementEnhanced = () => {
     return 'text-green-600';
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'connected':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-600" />;
-      case 'checking':
-        return <Clock className="w-4 h-4 text-orange-600" />;
-      default:
-        return null;
-    }
-  };
 
   return (
     <div className="space-y-6">
-      {/* Status de Conexão */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {getStatusIcon(connectionStatus)}
-              <span className="text-sm font-medium">
-                Status da Conexão: {
-                  connectionStatus === 'connected' ? 'Conectado' :
-                  connectionStatus === 'error' ? 'Erro' : 'Verificando...'
-                }
-              </span>
-            </div>
-            {connectionStatus === 'error' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setConnectionStatus('connected')}
-              >
-                Tentar Reconectar
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Plano Atual */}
       <Card>
@@ -279,34 +237,28 @@ export const BillingManagementEnhanced = () => {
             
             <div className="space-y-3">
               <Button 
-                className="w-full"
-                onClick={openStripePortal}
-                disabled={portalLoading || connectionStatus === 'error'}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                onClick={() => setShowUpgradeModal(true)}
               >
-                {portalLoading ? (
-                  <>
-                    <LoadingSpinner size="sm" className="mr-2" />
-                    Carregando...
-                  </>
-                ) : (
-                  "Fazer Upgrade"
-                )}
+                Mudar de Plano
               </Button>
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={openStripePortal}
-                disabled={portalLoading || connectionStatus === 'error'}
+                onClick={() => setShowCreditsModal(true)}
               >
-                {portalLoading ? "Carregando..." : "Alterar Método de Pagamento"}
+                <Zap className="w-4 h-4 mr-2" />
+                Comprar Créditos IA
               </Button>
               <Button
                 variant="ghost"
-                className="w-full text-red-600"
-                onClick={openStripePortal}
-                disabled={portalLoading || connectionStatus === 'error'}
+                className="w-full text-gray-600"
+                onClick={() => showInfo({
+                  title: "Gerenciar Assinatura",
+                  description: "Entre em contato com o suporte para alterar método de pagamento ou cancelar."
+                })}
               >
-                {portalLoading ? "Carregando..." : "Cancelar Assinatura"}
+                Gerenciar Pagamento
               </Button>
             </div>
           </div>
@@ -411,6 +363,21 @@ export const BillingManagementEnhanced = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Modais */}
+      <UpgradePlanModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentPlan={currentPlan}
+        onSuccess={handleUpgradeSuccess}
+      />
+
+      <PurchaseCreditsModal
+        isOpen={showCreditsModal}
+        onClose={() => setShowCreditsModal(false)}
+        currentCredits={usage.aiCredits}
+        onSuccess={handleCreditsSuccess}
+      />
     </div>
   );
 };

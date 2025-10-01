@@ -46,8 +46,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<DatabaseProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // FIX: Usar refs para evitar vazamento de memória
+  const isMountedRef = useRef(true);
+  const profileFetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const authSubscriptionRef = useRef<any>(null);
 
   const fetchProfile = useCallback(async (userId: string, userEmail: string) => {
+    // FIX: Verificar se componente ainda está montado
+    if (!isMountedRef.current) return;
     try {
       console.log('Fetching profile for user:', userId);
       
@@ -57,6 +64,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .eq('id', userId)
         .single();
       
+      if (!isMountedRef.current) return;
+
       if (error) {
         console.log('Profile fetch error:', error);
         
@@ -81,6 +90,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .select()
             .single();
             
+          if (!isMountedRef.current) return;
+
           if (createError) {
             console.error('Error creating profile:', handleSupabaseError(createError));
             setProfile(null);
@@ -109,8 +120,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setProfile(null);
       }
     } catch (error) {
-      console.error('Profile fetch error:', handleSupabaseError(error));
-      setProfile(null);
+      if (isMountedRef.current) {
+        console.error('Profile fetch error:', handleSupabaseError(error));
+        setProfile(null);
+      }
     }
   }, []);
 
@@ -121,52 +134,81 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [user?.id, user?.email, fetchProfile]);
 
   useEffect(() => {
-    let isMounted = true;
+    isMountedRef.current = true;
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!isMounted) return;
+    // FIX: Configurar listener de autenticação com cleanup adequado
+    const setupAuth = async () => {
+      // Configurar listener
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (!isMountedRef.current) return;
+          
+          console.log('Auth state changed:', event, session?.user?.id);
+          
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          // FIX: Limpar timeout anterior
+          if (profileFetchTimeoutRef.current) {
+            clearTimeout(profileFetchTimeoutRef.current);
+          }
+          
+          if (session?.user) {
+            // FIX: Usar timeout para evitar bloqueio
+            profileFetchTimeoutRef.current = setTimeout(() => {
+              if (isMountedRef.current) {
+                fetchProfile(session.user.id, session.user.email || '');
+              }
+            }, 0);
+          } else {
+            setProfile(null);
+          }
+          
+          setLoading(false);
+        }
+      );
+
+      authSubscriptionRef.current = subscription;
+
+      // FIX: Verificar sessão existente com tratamento de erro
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        console.log('Auth state changed:', event, session?.user?.id);
+        if (!isMountedRef.current) return;
+        
+        if (error) {
+          console.error('Session error:', handleSupabaseError(error));
+        }
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Defer profile fetch to avoid blocking auth state change
-          setTimeout(() => {
-            if (isMounted) {
-              fetchProfile(session.user.id, session.user.email || '');
-            }
-          }, 0);
-        } else {
-          setProfile(null);
+          await fetchProfile(session.user.id, session.user.email || '');
         }
         
         setLoading(false);
+      } catch (error) {
+        if (isMountedRef.current) {
+          console.error('Session fetch error:', error);
+          setLoading(false);
+        }
       }
-    );
+    };
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (!isMounted) return;
-      
-      if (error) {
-        console.error('Session error:', handleSupabaseError(error));
-      }
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email || '');
-      }
-      setLoading(false);
-    });
+    setupAuth();
 
+    // FIX: Cleanup completo para evitar vazamento de memória
     return () => {
-      isMounted = false;
-      subscription.unsubscribe();
+      isMountedRef.current = false;
+      
+      if (profileFetchTimeoutRef.current) {
+        clearTimeout(profileFetchTimeoutRef.current);
+      }
+      
+      if (authSubscriptionRef.current) {
+        authSubscriptionRef.current.unsubscribe();
+      }
     };
   }, [fetchProfile]);
 
@@ -191,12 +233,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      // FIX: Adicionar retry logic para falhas ocasionais
+      let attempts = 0;
+      const maxAttempts = 3;
+      let lastError: any = null;
+
+      while (attempts < maxAttempts) {
+        try {
+          const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (!error) {
+            return { error: null };
+          }
+          
+          lastError = error;
+          attempts++;
+          
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+          }
+        } catch (err) {
+          lastError = err;
+          attempts++;
+        }
+      }
       
-      return { error: error ? handleSupabaseError(error) : null };
+      return { error: lastError ? handleSupabaseError(lastError) : null };
     } catch (error) {
       return { error: handleSupabaseError(error) };
     }
@@ -204,6 +269,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = useCallback(async () => {
     try {
+      // FIX: Limpar estado local antes de fazer logout
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
       await supabase.auth.signOut();
     } catch (error) {
       console.error('Sign out error:', handleSupabaseError(error));
