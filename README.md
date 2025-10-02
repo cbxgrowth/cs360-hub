@@ -6,7 +6,6 @@ Plataforma completa de Customer Success Management com análise avançada de LTV
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/080c74de-b7d4-4a73-b566-738c37d3c8ae
 **Version**: 1.0.0
 **Status**: Production Ready ✅
 
@@ -14,15 +13,9 @@ Plataforma completa de Customer Success Management com análise avançada de LTV
 
 There are several ways of editing your application.
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/080c74de-b7d4-4a73-b566-738c37d3c8ae) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
