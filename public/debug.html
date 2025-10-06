@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS360° Hub - Debug</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 48px;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        .debug-panel {
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .status {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .warning { color: #fbbf24; }
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 CS360° Hub Debug</h1>
+        
+        <div class="debug-panel">
+            <h3>📊 System Status</h3>
+            <div class="status">
+                <span>Timestamp:</span>
+                <span id="timestamp">Loading...</span>
+            </div>
+            <div class="status">
+                <span>JavaScript:</span>
+                <span id="js-status" class="success">✅ Working</span>
+            </div>
+            <div class="status">
+                <span>DOM Ready:</span>
+                <span id="dom-status">Loading...</span>
+            </div>
+            <div class="status">
+                <span>Network:</span>
+            <span id="network-status">Loading...</span>
+            </div>
+            <div class="status">
+                <span>User Agent:</span>
+                <span id="user-agent">Loading...</span>
+            </div>
+            <div class="status">
+                <span>Screen Size:</span>
+                <span id="screen-size">Loading...</span>
+            </div>
+        </div>
+
+        <div class="debug-panel">
+            <h3>🧪 Network Tests</h3>
+            <button onclick="testBasicConnectivity()">Test Basic Connectivity</button>
+            <button onclick="testAssetLoading()">Test Asset Loading</button>
+            <button onclick="testCDN()">Test CDN</button>
+            <button onclick="testAPI()">Test API</button>
+            <div id="test-results" class="test-results" style="display: none;">
+                <h4>Test Results:</h4>
+                <div id="test-output"></div>
+            </div>
+        </div>
+
+        <div class="debug-panel">
+            <h3>🔧 Manual Tests</h3>
+            <button onclick="checkConsole()">Check Console</button>
+            <button onclick="checkNetwork()">Check Network Tab</button>
+            <button onclick="checkSources()">Check Sources Tab</button>
+            <button onclick="reloadPage()">Reload Page</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <p>Se você está vendo esta página, o servidor está funcionando!</p>
+            <button onclick="window.location.href='/'">Voltar ao App</button>
+        </div>
+    </div>
+
+    <script>
+        // Update status in real-time
+        function updateStatus() {
+            document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+            document.getElementById('dom-status').innerHTML = document.readyState === 'complete' ? 
+                '<span class="success">✅ Complete</span>' : 
+                '<span class="warning">⏳ ' + document.readyState + '</span>';
+            document.getElementById('network-status').innerHTML = navigator.onLine ? 
+                '<span class="success">✅ Online</span>' : 
+                '<span class="error">❌ Offline</span>';
+            document.getElementById('user-agent').textContent = navigator.userAgent.substring(0, 50) + '...';
+            document.getElementById('screen-size').textContent = screen.width + 'x' + screen.height;
+        }
+
+        // Test functions
+        function testBasicConnectivity() {
+            showTestResults('Testing basic connectivity...');
+            fetch('/placeholder.svg')
+                .then(response => {
+                    if (response.ok) {
+                        showTestResults('✅ Basic connectivity: OK');
+                    } else {
+                        showTestResults('❌ Basic connectivity: Failed - ' + response.status);
+                    }
+                })
+                .catch(error => {
+                    showTestResults('❌ Basic connectivity: Error - ' + error.message);
+                });
+        }
+
+        function testAssetLoading() {
+            showTestResults('Testing asset loading...');
+            const assets = [
+                '/assets/index-f_gZNjXE.css',
+                '/assets/index-D4XK87Co.js',
+                '/assets/StaticLanding-DxF7W9_A.js'
+            ];
+            
+            let results = [];
+            let completed = 0;
+            
+            assets.forEach(asset => {
+                fetch(asset)
+                    .then(response => {
+                        results.push(`${response.ok ? '✅' : '❌'} ${asset}: ${response.status}`);
+                        completed++;
+                        if (completed === assets.length) {
+                            showTestResults(results.join('<br>'));
+                        }
+                    })
+                    .catch(error => {
+                        results.push(`❌ ${asset}: ${error.message}`);
+                        completed++;
+                        if (completed === assets.length) {
+                            showTestResults(results.join('<br>'));
+                        }
+                    });
+            });
+        }
+
+        function testCDN() {
+            showTestResults('Testing CDN...');
+            // Test if we can reach external resources
+            fetch('https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap')
+                .then(response => {
+                    if (response.ok) {
+                        showTestResults('✅ CDN: Google Fonts accessible');
+                    } else {
+                        showTestResults('❌ CDN: Google Fonts failed - ' + response.status);
+                    }
+                })
+                .catch(error => {
+                    showTestResults('❌ CDN: Error - ' + error.message);
+                });
+        }
+
+        function testAPI() {
+            showTestResults('Testing API endpoints...');
+            // Test Supabase connection
+            fetch('https://dztwbgxumkoibuzlabab.supabase.co/rest/v1/', {
+                method: 'HEAD',
+                headers: {
+                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dHdiZ3h1bWtvaWJ1emxhYmFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTUyMDAsImV4cCI6MjA2NTIzMTIwMH0.IzU_nMpZY5iGnb_lJDJ3heSk9OP6B98dDF9J-6NRbXc'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    showTestResults('✅ API: Supabase accessible');
+                } else {
+                    showTestResults('❌ API: Supabase failed - ' + response.status);
+                }
+            })
+            .catch(error => {
+                showTestResults('❌ API: Error - ' + error.message);
+            });
+        }
+
+        function showTestResults(message) {
+            document.getElementById('test-results').style.display = 'block';
+            document.getElementById('test-output').innerHTML = message;
+        }
+
+        function checkConsole() {
+            console.log('🔍 Manual Console Check:');
+            console.log('DOM Root:', document.getElementById('root'));
+            console.log('Scripts:', document.scripts.length);
+            console.log('Stylesheets:', document.styleSheets.length);
+            console.log('Network:', navigator.onLine);
+            console.log('User Agent:', navigator.userAgent);
+            showTestResults('Check the browser console (F12) for detailed logs');
+        }
+
+        function checkNetwork() {
+            showTestResults('Open Network tab (F12) and check for: 404 errors, CORS errors, failed requests');
+        }
+
+        function checkSources() {
+            showTestResults('Open Sources tab (F12) and check if all files are present in the correct paths');
+        }
+
+        function reloadPage() {
+            window.location.reload();
+        }
+
+        // Initialize
+        updateStatus();
+        setInterval(updateStatus, 1000);
+
+        // Log to console
+        console.log('🔍 CS360° Hub Debug Page Loaded');
+        console.log('Timestamp:', new Date().toISOString());
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Screen:', screen.width + 'x' + screen.height);
+        console.log('Network:', navigator.onLine);
+        console.log('DOM Ready State:', document.readyState);
+    </script>
+</body>
+</html>
