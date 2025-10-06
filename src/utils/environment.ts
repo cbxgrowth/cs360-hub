@@ -14,15 +14,23 @@ export const Environment = {
       'VITE_SUPABASE_ANON_KEY'
     ];
     
-    const missing = required.filter(key => !import.meta.env[key]);
+    // Valores padrão do Supabase (fallbacks)
+    const defaults = {
+      'VITE_SUPABASE_URL': 'https://dztwbgxumkoibuzlabab.supabase.co',
+      'VITE_SUPABASE_ANON_KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dHdiZ3h1bWtvaWJ1emxhYmFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTUyMDAsImV4cCI6MjA2NTIzMTIwMH0.IzU_nMpZY5iGnb_lJDJ3heSk9OP6B98dDF9J-6NRbXc'
+    };
+    
+    // Verificar se está configurada ou tem fallback
+    const missing = required.filter(key => !import.meta.env[key] && !defaults[key]);
     
     return {
       isValid: missing.length === 0,
       missing,
       all: required.map(key => ({
         key,
-        value: import.meta.env[key] ? '✓ Configurada' : '❌ Ausente',
-        present: !!import.meta.env[key]
+        value: import.meta.env[key] ? '✓ Configurada' : (defaults[key] ? '🔧 Fallback' : '❌ Ausente'),
+        present: !!(import.meta.env[key] || defaults[key]),
+        usingFallback: !import.meta.env[key] && !!defaults[key]
       }))
     };
   },

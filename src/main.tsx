@@ -14,10 +14,10 @@ const initializeApp = async () => {
 
     // Verificar variáveis de ambiente essenciais
     const envCheck = Environment.checkRequiredEnvVars();
-    if (!envCheck.isValid && Environment.isProduction()) {
+    if (!envCheck.isValid) {
       console.error('❌ Missing required environment variables:', envCheck.missing);
       
-      // Em produção, mostrar erro mais amigável
+      // Mostrar erro mais amigável quando realmente faltam configurações críticas
       rootElement.innerHTML = `
         <div style="
           min-height: 100vh;
@@ -102,6 +102,15 @@ const initializeApp = async () => {
     // Executar diagnósticos em desenvolvimento
     if (Environment.isDevelopment()) {
       Environment.logDiagnostics();
+    }
+
+    // Verificar se está usando fallbacks em produção
+    if (Environment.isProduction()) {
+      const usingFallbacks = envCheck.all.some(env => env.usingFallback);
+      if (usingFallbacks) {
+        console.info('🔧 Using fallback configuration for Supabase. Consider setting environment variables for production.');
+        console.info('Fallback configs:', envCheck.all.filter(env => env.usingFallback));
+      }
     }
 
   } catch (error) {
