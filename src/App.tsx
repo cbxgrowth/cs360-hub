@@ -17,6 +17,8 @@ const Landing = React.lazy(() => import('./pages/Landing'));
 const SimpleLanding = React.lazy(() => import('./components/SimpleLanding').then(module => ({ default: module.SimpleLanding })));
 // Fallback ultra-simples para debug profundo
 const UltraSimpleLanding = React.lazy(() => import('./components/UltraSimpleLanding').then(module => ({ default: module.UltraSimpleLanding })));
+// Componente de diagnóstico para identificar problemas
+const DiagnosticLanding = React.lazy(() => import('./components/DiagnosticLanding').then(module => ({ default: module.DiagnosticLanding })));
 const DashboardApp = React.lazy(() => import('./pages/App'));
 const Clients = React.lazy(() => import('./pages/Clients'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -84,7 +86,8 @@ function App() {
                   <Suspense fallback={<LoadingState />}>
                     <Routes>
                   {/* Public Website Routes */}
-                  <Route path="/" element={<UltraSimpleLanding />} />
+                  <Route path="/" element={<DiagnosticLanding />} />
+                  <Route path="/ultra-simple" element={<UltraSimpleLanding />} />
                   <Route path="/landing-simple" element={<SimpleLanding />} />
                   <Route path="/landing-full" element={<Landing />} />
                   <Route path="/features" element={<Features />} />

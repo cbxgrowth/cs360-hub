@@ -18,27 +18,27 @@ export const useLeadPopup = (delayInSeconds: number = 10) => {
     }
 
     try {
-      // Check if popup has already been shown in this session
-      const popupShown = sessionStorage.getItem('leadPopupShown');
-      
-      if (popupShown) {
-        setHasBeenShown(true);
-        return;
-      }
+    // Check if popup has already been shown in this session
+    const popupShown = sessionStorage.getItem('leadPopupShown');
+    
+    if (popupShown) {
+      setHasBeenShown(true);
+      return;
+    }
 
-      const timer = setTimeout(() => {
-        if (!hasBeenShown) {
-          setIsPopupOpen(true);
-          setHasBeenShown(true);
+    const timer = setTimeout(() => {
+      if (!hasBeenShown) {
+        setIsPopupOpen(true);
+        setHasBeenShown(true);
           try {
-            sessionStorage.setItem('leadPopupShown', 'true');
+        sessionStorage.setItem('leadPopupShown', 'true');
           } catch (error) {
             console.warn('Failed to save to sessionStorage:', error);
           }
-        }
-      }, delayInSeconds * 1000);
+      }
+    }, delayInSeconds * 1000);
 
-      return () => clearTimeout(timer);
+    return () => clearTimeout(timer);
     } catch (error) {
       console.warn('SessionStorage not available:', error);
     }
