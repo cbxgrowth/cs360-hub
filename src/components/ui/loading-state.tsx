@@ -1,18 +1,60 @@
-import React from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Loader2, AlertTriangle, WifiOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FallbackPage } from './fallback-page';
 
 interface LoadingStateProps {
   size?: 'sm' | 'md' | 'lg';
   text?: string;
   className?: string;
+  timeout?: number; // Timeout em ms para mostrar fallback
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({ 
   size = 'md', 
   text = 'Carregando...', 
-  className 
+  className,
+  timeout = 10000 // 10 segundos por padrão
 }) => {
+  const [isTimedOut, setIsTimedOut] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  
+  useEffect(() => {
+    // Timeout para mostrar fallback se demorar muito
+    const timeoutId = setTimeout(() => {
+      setIsTimedOut(true);
+    }, timeout);
+    
+    // Listeners de conectividade
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [timeout]);
+  
+  // Se está offline, mostrar página de offline
+  if (isOffline) {
+    return <FallbackPage type="offline" onRetry={() => window.location.reload()} />;
+  }
+  
+  // Se demorou muito, mostrar fallback de erro
+  if (isTimedOut) {
+    return (
+      <FallbackPage 
+        type="error"
+        title="Carregamento demorado"
+        message="A página está demorando mais que o normal para carregar. Verifique sua conexão."
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',

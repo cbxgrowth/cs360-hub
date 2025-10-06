@@ -5,7 +5,9 @@ import { compression } from 'vite-plugin-compression2';
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, command }) => ({
+  // Base path configurável para deploy
+  base: process.env.VITE_BASE_PATH || '/',
   plugins: [
     react(),
     // Compressão Gzip

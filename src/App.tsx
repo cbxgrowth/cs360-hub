@@ -9,6 +9,7 @@ import { SuperAdminProvider } from '@/hooks/useSuperAdmin';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LoadingState, DashboardLoadingState, ClientsLoadingState, ReportsLoadingState } from '@/components/ui/loading-state';
 import { RoutePreloader } from '@/utils/routePreloader';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Pages (Lazy Loading)
 const Landing = React.lazy(() => import('./pages/Landing'));
@@ -69,14 +70,15 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <SuperAdminProvider>
-            <Router>
-              <div className="App">
-                <Suspense fallback={<LoadingState />}>
-                  <Routes>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <SuperAdminProvider>
+              <Router>
+                <div className="App">
+                  <Suspense fallback={<LoadingState />}>
+                    <Routes>
                   {/* Public Website Routes */}
                   <Route path="/" element={<Landing />} />
                   <Route path="/features" element={<Features />} />
@@ -241,6 +243,7 @@ function App() {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
