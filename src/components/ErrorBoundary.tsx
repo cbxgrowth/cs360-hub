@@ -35,9 +35,21 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo
     });
 
+    // Log detalhado do erro
+    const errorDetails = {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
+    };
+
+    console.error('📋 Error Details:', errorDetails);
+
     // Log para serviço de monitoramento em produção
     if (process.env.NODE_ENV === 'production') {
-      // Aqui você pode enviar para um serviço como Sentry
       this.logErrorToService(error, errorInfo);
     }
   }

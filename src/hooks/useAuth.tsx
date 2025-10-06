@@ -214,7 +214,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signUp = useCallback(async (email: string, password: string, userData?: any) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/` 
+        : 'https://localhost:3000/';
       
       const { error } = await supabase.auth.signUp({
         email,

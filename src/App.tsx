@@ -13,6 +13,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Pages (Lazy Loading)
 const Landing = React.lazy(() => import('./pages/Landing'));
+// Fallback simples para debug
+const SimpleLanding = React.lazy(() => import('./components/SimpleLanding').then(module => ({ default: module.SimpleLanding })));
 const DashboardApp = React.lazy(() => import('./pages/App'));
 const Clients = React.lazy(() => import('./pages/Clients'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -80,7 +82,8 @@ function App() {
                   <Suspense fallback={<LoadingState />}>
                     <Routes>
                   {/* Public Website Routes */}
-                  <Route path="/" element={<Landing />} />
+                  <Route path="/" element={<SimpleLanding />} />
+                  <Route path="/landing-full" element={<Landing />} />
                   <Route path="/features" element={<Features />} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/partners-program" element={<PartnersProgram />} />
