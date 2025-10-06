@@ -21,6 +21,8 @@ const UltraSimpleLanding = React.lazy(() => import('./components/UltraSimpleLand
 const DiagnosticLanding = React.lazy(() => import('./components/DiagnosticLanding').then(module => ({ default: module.DiagnosticLanding })));
 // Componente MÍNIMO - sem hooks, sem imports complexos
 const MinimalLanding = React.lazy(() => import('./components/MinimalLanding').then(module => ({ default: module.MinimalLanding })));
+// Componente ESTÁTICO - HTML puro com debug
+const StaticLanding = React.lazy(() => import('./components/StaticLanding').then(module => ({ default: module.StaticLanding })));
 const DashboardApp = React.lazy(() => import('./pages/App'));
 const Clients = React.lazy(() => import('./pages/Clients'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -88,7 +90,8 @@ function App() {
                   <Suspense fallback={<LoadingState />}>
                     <Routes>
                   {/* Public Website Routes */}
-                  <Route path="/" element={<MinimalLanding />} />
+                  <Route path="/" element={<StaticLanding />} />
+                  <Route path="/minimal" element={<MinimalLanding />} />
                   <Route path="/diagnostic" element={<DiagnosticLanding />} />
                   <Route path="/ultra-simple" element={<UltraSimpleLanding />} />
                   <Route path="/landing-simple" element={<SimpleLanding />} />
