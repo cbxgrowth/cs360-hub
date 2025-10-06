@@ -288,7 +288,7 @@ npm run build
 # Preview do build
 npm run preview
 
-# Deploy (via Lovable ou custom)
+# Deploy para produção
 # Seguir instruções no README.md
 ```
 
