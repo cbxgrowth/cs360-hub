@@ -15,6 +15,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 const Landing = React.lazy(() => import('./pages/Landing'));
 // Fallback simples para debug
 const SimpleLanding = React.lazy(() => import('./components/SimpleLanding').then(module => ({ default: module.SimpleLanding })));
+// Fallback ultra-simples para debug profundo
+const UltraSimpleLanding = React.lazy(() => import('./components/UltraSimpleLanding').then(module => ({ default: module.UltraSimpleLanding })));
 const DashboardApp = React.lazy(() => import('./pages/App'));
 const Clients = React.lazy(() => import('./pages/Clients'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -72,7 +74,7 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
+    // <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <AuthProvider>
@@ -82,7 +84,8 @@ function App() {
                   <Suspense fallback={<LoadingState />}>
                     <Routes>
                   {/* Public Website Routes */}
-                  <Route path="/" element={<SimpleLanding />} />
+                  <Route path="/" element={<UltraSimpleLanding />} />
+                  <Route path="/landing-simple" element={<SimpleLanding />} />
                   <Route path="/landing-full" element={<Landing />} />
                   <Route path="/features" element={<Features />} />
                   <Route path="/pricing" element={<Pricing />} />
@@ -246,7 +249,7 @@ function App() {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
-    </ErrorBoundary>
+    // </ErrorBoundary>
   );
 }
 
