@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -7,45 +7,47 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/hooks/useAuth';
 import { SuperAdminProvider } from '@/hooks/useSuperAdmin';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LoadingState, DashboardLoadingState, ClientsLoadingState, ReportsLoadingState } from '@/components/ui/loading-state';
+import { RoutePreloader } from '@/utils/routePreloader';
 
-// Pages
-import Landing from './pages/Landing';
-import DashboardApp from './pages/App';
-import Clients from './pages/Clients';
-import Contracts from './pages/Contracts';
-import Reports from './pages/Reports';
-import Goals from './pages/Goals';
-import Services from './pages/Services';
-import NPS from './pages/NPS';
-import LTVCAC from './pages/LTVCAC';
-import Strategies from './pages/Strategies';
-import Automation from './pages/Automation';
-import Partners from './pages/Partners';
-import Campaigns from './pages/Campaigns';
-import PartnerPortalPage from './pages/PartnerPortalPage';
-import Admin from './pages/Admin';
-import SuperAdmin from './pages/SuperAdmin';
-import Features from './pages/Features';
-import Pricing from './pages/Pricing';
-import PartnersProgram from './pages/PartnersProgram';
-import PartnerPortalWebsite from './pages/PartnerPortalWebsite';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ExecutiveDemo from './pages/ExecutiveDemo';
-import Onboarding from './pages/Onboarding';
-import SuperAdminLogin from './pages/SuperAdminLogin';
-import Profile from './pages/Profile';
-import Summary from './pages/Summary';
+// Pages (Lazy Loading)
+const Landing = React.lazy(() => import('./pages/Landing'));
+const DashboardApp = React.lazy(() => import('./pages/App'));
+const Clients = React.lazy(() => import('./pages/Clients'));
+const Contracts = React.lazy(() => import('./pages/Contracts'));
+const Reports = React.lazy(() => import('./pages/Reports'));
+const Goals = React.lazy(() => import('./pages/Goals'));
+const Services = React.lazy(() => import('./pages/Services'));
+const NPS = React.lazy(() => import('./pages/NPS'));
+const LTVCAC = React.lazy(() => import('./pages/LTVCAC'));
+const Strategies = React.lazy(() => import('./pages/Strategies'));
+const Automation = React.lazy(() => import('./pages/Automation'));
+const Partners = React.lazy(() => import('./pages/Partners'));
+const Campaigns = React.lazy(() => import('./pages/Campaigns'));
+const PartnerPortalPage = React.lazy(() => import('./pages/PartnerPortalPage'));
+const Admin = React.lazy(() => import('./pages/Admin'));
+const SuperAdmin = React.lazy(() => import('./pages/SuperAdmin'));
+const Features = React.lazy(() => import('./pages/Features'));
+const Pricing = React.lazy(() => import('./pages/Pricing'));
+const PartnersProgram = React.lazy(() => import('./pages/PartnersProgram'));
+const PartnerPortalWebsite = React.lazy(() => import('./pages/PartnerPortalWebsite'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Register = React.lazy(() => import('./pages/Register'));
+const ExecutiveDemo = React.lazy(() => import('./pages/ExecutiveDemo'));
+const Onboarding = React.lazy(() => import('./pages/Onboarding'));
+const SuperAdminLogin = React.lazy(() => import('./pages/SuperAdminLogin'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const Summary = React.lazy(() => import('./pages/Summary'));
 
 // New Detail Pages
-import NPSDetails from './pages/NPSDetails';
-import ChurnStrategies from './pages/ChurnStrategies';
+const NPSDetails = React.lazy(() => import('./pages/NPSDetails'));
+const ChurnStrategies = React.lazy(() => import('./pages/ChurnStrategies'));
 
 // New Category Pages
-import CategoryTechnology from './pages/CategoryTechnology';
-import CategoryHealth from './pages/CategoryHealth';
-import CategoryFinancial from './pages/CategoryFinancial';
-import CategoryEcommerce from './pages/CategoryEcommerce';
+const CategoryTechnology = React.lazy(() => import('./pages/CategoryTechnology'));
+const CategoryHealth = React.lazy(() => import('./pages/CategoryHealth'));
+const CategoryFinancial = React.lazy(() => import('./pages/CategoryFinancial'));
+const CategoryEcommerce = React.lazy(() => import('./pages/CategoryEcommerce'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +63,11 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Precarregar rotas críticas em background
+  React.useEffect(() => {
+    RoutePreloader.preloadCriticalRoutes();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -68,7 +75,8 @@ function App() {
           <SuperAdminProvider>
             <Router>
               <div className="App">
-                <Routes>
+                <Suspense fallback={<LoadingState />}>
+                  <Routes>
                   {/* Public Website Routes */}
                   <Route path="/" element={<Landing />} />
                   <Route path="/features" element={<Features />} />
@@ -91,7 +99,9 @@ function App() {
                   {/* Protected Application Routes */}
                   <Route path="/app" element={
                     <ProtectedRoute>
-                      <DashboardApp />
+                      <Suspense fallback={<DashboardLoadingState />}>
+                        <DashboardApp />
+                      </Suspense>
                     </ProtectedRoute>
                   } />
                   
@@ -102,7 +112,9 @@ function App() {
                   } />
                   <Route path="/clients" element={
                     <ProtectedRoute>
-                      <Clients />
+                      <Suspense fallback={<ClientsLoadingState />}>
+                        <Clients />
+                      </Suspense>
                     </ProtectedRoute>
                   } />
                   <Route path="/contracts" element={
@@ -137,7 +149,9 @@ function App() {
                   } />
                   <Route path="/reports" element={
                     <ProtectedRoute>
-                      <Reports />
+                      <Suspense fallback={<ReportsLoadingState />}>
+                        <Reports />
+                      </Suspense>
                     </ProtectedRoute>
                   } />
 
@@ -216,9 +230,10 @@ function App() {
                     </ProtectedRoute>
                   } />
 
-                  {/* Fallback */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
                 <Toaster />
               </div>
             </Router>

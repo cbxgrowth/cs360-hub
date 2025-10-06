@@ -166,11 +166,11 @@ This project is proprietary software. All rights reserved.
 
 ## 🙏 Acknowledgments
 
-- Built with [Lovable](https://lovable.dev)
+- Built with 
 - UI Components by [shadcn/ui](https://ui.shadcn.com)
 - Icons by [Lucide](https://lucide.dev)
 - Backend by [Supabase](https://supabase.com)
 
 ---
 
-**Made with ❤️ by the CS360 Team**
+**Made with  by the CS360 Team**

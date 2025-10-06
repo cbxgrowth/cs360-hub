@@ -1,76 +1,55 @@
-
 import React from 'react';
-import { Skeleton } from './skeleton';
-import { Card, CardContent, CardHeader } from './card';
 import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface LoadingStateProps {
-  type?: 'skeleton' | 'spinner' | 'card' | 'table';
-  rows?: number;
+  size?: 'sm' | 'md' | 'lg';
+  text?: string;
   className?: string;
-  message?: string;
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({ 
-  type = 'skeleton', 
-  rows = 3, 
-  className = '',
-  message = 'Carregando...'
+  size = 'md', 
+  text = 'Carregando...', 
+  className 
 }) => {
-  switch (type) {
-    case 'spinner':
-      return (
-        <div className={`flex items-center justify-center p-8 ${className}`}>
-          <div className="flex flex-col items-center space-y-3">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">{message}</p>
-          </div>
-        </div>
-      );
+  const sizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-8 w-8',
+    lg: 'h-12 w-12'
+  };
 
-    case 'card':
-      return (
-        <Card className={className}>
-          <CardHeader>
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {Array.from({ length: rows }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-full" />
-            ))}
-          </CardContent>
-        </Card>
-      );
-
-    case 'table':
-      return (
-        <div className={`space-y-3 ${className}`}>
-          <Skeleton className="h-10 w-full" />
-          {Array.from({ length: rows }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
+  return (
+    <div className={cn(
+      "min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100",
+      className
+    )}>
+      <div className="text-center space-y-4">
+        <Loader2 className={cn("animate-spin text-blue-600 mx-auto", sizeClasses[size])} />
+        <p className="text-gray-600 font-medium">{text}</p>
+        
+        {/* Progress bar simulation */}
+        <div className="w-64 bg-gray-200 rounded-full h-2 mx-auto">
+          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
         </div>
-      );
-
-    default:
-      return (
-        <div className={`space-y-3 ${className}`}>
-          {Array.from({ length: rows }).map((_, i) => (
-            <Skeleton key={i} className="h-4 w-full" />
-          ))}
-        </div>
-      );
-  }
+        
+        <p className="text-sm text-gray-500">
+          Preparando sua experiência...
+        </p>
+      </div>
+    </div>
+  );
 };
 
-export const LoadingWrapper: React.FC<{
-  loading: boolean;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}> = ({ loading, children, fallback }) => {
-  if (loading) {
-    return fallback || <LoadingState />;
-  }
-  return <>{children}</>;
-};
+// Page-specific loading states
+export const DashboardLoadingState = () => (
+  <LoadingState text="Carregando Dashboard..." className="bg-gradient-to-br from-slate-50 to-gray-100" />
+);
+
+export const ClientsLoadingState = () => (
+  <LoadingState text="Carregando Clientes..." className="bg-gradient-to-br from-green-50 to-emerald-100" />
+);
+
+export const ReportsLoadingState = () => (
+  <LoadingState text="Carregando Relatórios..." className="bg-gradient-to-br from-purple-50 to-violet-100" />
+);

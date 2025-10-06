@@ -19,10 +19,10 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // Temporariamente permitir acesso sem login para demonstração
-  // if (!user) {
-  //   return <Navigate to="/login" replace />;
-  // }
+  // Verificar se usuário está autenticado
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return <>{children}</>;
 };

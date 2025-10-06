@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  cs360-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: cs360-hub-prod
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+      - "443:8443"
+    environment:
+      - NODE_ENV=production
+      - NGINX_ENTRYPOINT_QUIET_LOGS=1
+    volumes:
+      # SSL certificates (se usando Let's Encrypt)
+      - ./ssl:/etc/ssl/certs:ro
+      # Logs persistentes
+      - ./logs:/var/log/nginx
+    networks:
+      - cs360-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cs360.rule=Host(`cs360hub.com`)"
+      - "traefik.http.routers.cs360.entrypoints=websecure"
+      - "traefik.http.routers.cs360.tls.certresolver=letsencrypt"
+      - "traefik.http.services.cs360.loadbalancer.server.port=8080"
+
+  # Load Balancer/Reverse Proxy (opcional)
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik-cs360
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Dashboard
+    environment:
+      - TRAEFIK_API_DASHBOARD=true
+      - TRAEFIK_API_INSECURE=true
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
+      - TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80
+      - TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS=:443
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL=admin@cs360hub.com
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_STORAGE=/letsencrypt/acme.json
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_HTTPCHALLENGE_ENTRYPOINT=web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - cs360-network
+    profiles:
+      - traefik
+
+  # Monitoring (opcional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-cs360
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - cs360-network
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-cs360
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - cs360-network
+    profiles:
+      - monitoring
+
+networks:
+  cs360-network:
+    driver: bridge
+
+volumes:
+  letsencrypt:
+  prometheus-data:
+  grafana-data:
+

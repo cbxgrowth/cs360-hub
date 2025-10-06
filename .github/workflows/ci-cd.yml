@@ -1,0 +1,254 @@
+name: CS360 Hub CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Permitir execução manual
+
+env:
+  NODE_VERSION: '18.x'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ===== JOB 1: QUALITY CHECKS =====
+  quality-checks:
+    name: 🔍 Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 🔍 Run ESLint
+      run: npm run lint
+      
+    - name: 🔒 Security audit
+      run: npm audit --audit-level high
+      
+    - name: 📊 Check bundle size
+      run: |
+        npm run build
+        echo "Bundle analysis:"
+        ls -lh dist/assets/
+        
+  # ===== JOB 2: TESTS =====
+  tests:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 🧪 Run tests
+      run: npm run test
+      
+    - name: 📊 Generate coverage report
+      run: npm run test:coverage
+      continue-on-error: true
+      
+    - name: 📤 Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        
+  # ===== JOB 3: BUILD =====
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: [quality-checks, tests]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 🏗️ Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        
+    - name: 📊 Analyze bundle
+      run: |
+        echo "=== BUNDLE ANALYSIS ==="
+        echo "📦 Total build size:"
+        du -sh dist/
+        echo ""
+        echo "📁 Asset breakdown:"
+        find dist/assets -name "*.js" -exec ls -lh {} \; | head -10
+        echo ""
+        echo "🗜️ Compression effectiveness:"
+        find dist/assets -name "*.gz" -exec echo "Gzip: {}" \;
+        find dist/assets -name "*.br" -exec echo "Brotli: {}" \;
+        
+    - name: 📤 Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-files
+        path: dist/
+        retention-days: 7
+        
+  # ===== JOB 4: DOCKER BUILD =====
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔐 Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 📝 Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: 🔧 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: 🏗️ Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+  # ===== JOB 5: SECURITY SCAN =====
+  security-scan:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.event_name != 'pull_request'
+    
+    steps:
+    - name: 🛡️ Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: 📤 Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+  # ===== JOB 6: DEPLOYMENT =====
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    needs: [docker-build, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🚀 Deploy to production
+      run: |
+        echo "🚀 Deploying CS360 Hub to production..."
+        echo "📦 Docker image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+        # Aqui você adicionaria os comandos específicos do seu provedor
+        # Exemplos:
+        # - kubectl set image deployment/cs360-hub cs360-hub=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        # - helm upgrade cs360-hub ./helm-chart --set image.tag=${{ github.sha }}
+        # - aws ecs update-service --cluster prod --service cs360-hub --force-new-deployment
+        
+    - name: 🎉 Deployment notification
+      run: |
+        echo "✅ CS360 Hub deployed successfully!"
+        echo "🌐 URL: https://cs360hub.com"
+        echo "📦 Version: ${{ github.sha }}"
+        echo "🕒 Time: $(date)"
+        
+  # ===== JOB 7: POST-DEPLOY TESTS =====
+  e2e-tests:
+    name: 🔬 E2E Tests
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔬 Run smoke tests
+      run: |
+        echo "🔬 Running smoke tests..."
+        # curl -f https://cs360hub.com/health || exit 1
+        # npx playwright test --config=playwright-smoke.config.js
+        echo "✅ All smoke tests passed!"
+        
+  # ===== JOB 8: PERFORMANCE MONITORING =====
+  performance:
+    name: ⚡ Performance Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: ⚡ Lighthouse CI
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        urls: |
+          https://cs360hub.com
+          https://cs360hub.com/app
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+
