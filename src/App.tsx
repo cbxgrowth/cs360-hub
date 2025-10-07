@@ -36,6 +36,14 @@ const Campaigns = React.lazy(() => import('./pages/Campaigns'));
 const NPS = React.lazy(() => import('./pages/NPS'));
 const LTVCAC = React.lazy(() => import('./pages/LTVCAC'));
 
+// Funcionalidades administrativas (FASE 4)
+const Admin = React.lazy(() => import('./pages/Admin'));
+const SuperAdmin = React.lazy(() => import('./pages/SuperAdmin'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const Summary = React.lazy(() => import('./pages/Summary'));
+const Onboarding = React.lazy(() => import('./pages/Onboarding'));
+const ExecutiveDemo = React.lazy(() => import('./pages/ExecutiveDemo'));
+
 // Componentes de loading otimizados
 const LoadingState = () => (
   <div style={{
@@ -235,6 +243,53 @@ const App: React.FC = () => {
                         <LTVCAC />
                       </Suspense>
                     </ProtectedRoute>
+                  } />
+                  
+                  {/* Funcionalidades administrativas (FASE 4) */}
+                  <Route path="/admin" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Admin />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/super-admin" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <SuperAdmin />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Profile />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/summary" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Summary />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/onboarding" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Onboarding />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/executive-demo" element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ExecutiveDemo />
+                    </Suspense>
                   } />
                   
                   {/* Fallback para rotas não encontradas */}
