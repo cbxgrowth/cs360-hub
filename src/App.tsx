@@ -27,6 +27,8 @@ const StaticLanding = React.lazy(() => import('./components/StaticLanding').then
 const WorkingLanding = React.lazy(() => import('./components/WorkingLanding').then(module => ({ default: module.WorkingLanding })));
 // Componente de diagnóstico ULTRA - identifica QUALQUER problema
 const UltraDiagnosticLanding = React.lazy(() => import('./components/UltraDiagnosticLanding').then(module => ({ default: module.UltraDiagnosticLanding })));
+// Componente SEM React - apenas HTML/CSS
+const NoReactLanding = React.lazy(() => import('./components/NoReactLanding').then(module => ({ default: module.NoReactLanding })));
 const DashboardApp = React.lazy(() => import('./pages/App'));
 const Clients = React.lazy(() => import('./pages/Clients'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -94,7 +96,8 @@ function App() {
                   <Suspense fallback={<LoadingState />}>
                     <Routes>
                   {/* Public Website Routes */}
-                  <Route path="/" element={<UltraDiagnosticLanding />} />
+                  <Route path="/" element={<NoReactLanding />} />
+                  <Route path="/ultra-diagnostic" element={<UltraDiagnosticLanding />} />
                   <Route path="/working" element={<WorkingLanding />} />
                   <Route path="/static" element={<StaticLanding />} />
                   <Route path="/minimal" element={<MinimalLanding />} />

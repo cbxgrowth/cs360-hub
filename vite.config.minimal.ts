@@ -6,14 +6,17 @@ import path from "path";
 export default defineConfig({
   // Base path fixo - sem variáveis de ambiente
   base: '/',
+  
   plugins: [
     react()
   ],
+  
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  
   build: {
     // Configuração mínima
     target: 'esnext',
