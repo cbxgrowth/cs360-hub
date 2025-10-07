@@ -27,6 +27,15 @@ const Reports = React.lazy(() => import('./pages/Reports'));
 const Goals = React.lazy(() => import('./pages/Goals'));
 const Services = React.lazy(() => import('./pages/Services'));
 
+// Funcionalidades avançadas (FASE 3)
+const Contracts = React.lazy(() => import('./pages/Contracts'));
+const Strategies = React.lazy(() => import('./pages/Strategies'));
+const Automation = React.lazy(() => import('./pages/Automation'));
+const Partners = React.lazy(() => import('./pages/Partners'));
+const Campaigns = React.lazy(() => import('./pages/Campaigns'));
+const NPS = React.lazy(() => import('./pages/NPS'));
+const LTVCAC = React.lazy(() => import('./pages/LTVCAC'));
+
 // Componentes de loading otimizados
 const LoadingState = () => (
   <div style={{
@@ -167,6 +176,63 @@ const App: React.FC = () => {
                     <ProtectedRoute>
                       <Suspense fallback={<LoadingState />}>
                         <Services />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Funcionalidades avançadas (FASE 3) */}
+                  <Route path="/contracts" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Contracts />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/strategies" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Strategies />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/automation" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Automation />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/partners" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Partners />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/campaigns" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Campaigns />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/nps" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <NPS />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/ltvcac" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <LTVCAC />
                       </Suspense>
                     </ProtectedRoute>
                   } />
