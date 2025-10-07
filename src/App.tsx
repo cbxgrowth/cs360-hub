@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 // Importar contextos essenciais
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LoadingProvider } from './contexts/LoadingContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Componentes básicos primeiro (sem dependências complexas)
 const SimpleLanding = React.lazy(() => import('./components/SimpleLanding'));
@@ -19,6 +20,12 @@ const Register = React.lazy(() => import('./pages/Register'));
 
 // Dashboard básico (sem dependências complexas)
 const DashboardBasic = React.lazy(() => import('./pages/App'));
+
+// Páginas protegidas (adicionando gradualmente)
+const Clients = React.lazy(() => import('./pages/Clients'));
+const Reports = React.lazy(() => import('./pages/Reports'));
+const Goals = React.lazy(() => import('./pages/Goals'));
+const Services = React.lazy(() => import('./pages/Services'));
 
 // Componentes de loading otimizados
 const LoadingState = () => (
@@ -130,6 +137,39 @@ const App: React.FC = () => {
                   
                   {/* Dashboard básico */}
                   <Route path="/dashboard" element={<DashboardBasic />} />
+                  
+                  {/* Rotas protegidas (FASE 2) */}
+                  <Route path="/clients" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Clients />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/reports" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Reports />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/goals" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Goals />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/services" element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<LoadingState />}>
+                        <Services />
+                      </Suspense>
+                    </ProtectedRoute>
+                  } />
                   
                   {/* Fallback para rotas não encontradas */}
                   <Route path="*" element={<Navigate to="/" replace />} />
