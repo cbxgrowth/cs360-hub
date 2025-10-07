@@ -32,6 +32,14 @@ export default defineConfig({
   
   server: {
     host: "::",
-    port: 8080
+    port: 8080,
+    // Configuração para SPA - redirecionar todas as rotas para index.html
+    historyApiFallback: true
+  },
+  
+  // Configuração para SPA no build
+  preview: {
+    port: 4173,
+    host: true
   }
 });
