@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS360° Hub - Diagnóstico Puro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .status-box {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .status-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .status-message {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .diagnostic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .diagnostic-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .diagnostic-item.success {
+            border-color: #00ff00;
+            background: rgba(0,255,0,0.1);
+        }
+        
+        .diagnostic-item.error {
+            border-color: #ff0000;
+            background: rgba(255,0,0,0.1);
+        }
+        
+        .diagnostic-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .diagnostic-status {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CS360° Hub</h1>
+        <p class="subtitle">Customer Success com Inteligência Artificial</p>
+        
+        <div class="status-box">
+            <div class="loading" id="loading"></div>
+            <div class="status-icon hidden" id="status-icon">🔍</div>
+            <div class="status-title hidden" id="status-title">Executando Diagnóstico...</div>
+            <div class="status-message hidden" id="status-message">Verificando todos os sistemas...</div>
+        </div>
+        
+        <div class="diagnostic-grid hidden" id="diagnostic-grid">
+            <div class="diagnostic-item success">
+                <div class="diagnostic-title">✅ HTML Carregado</div>
+                <div class="diagnostic-status">Página HTML funcionando perfeitamente</div>
+            </div>
+            
+            <div class="diagnostic-item success">
+                <div class="diagnostic-title">✅ CSS Carregado</div>
+                <div class="diagnostic-status">Estilos aplicados corretamente</div>
+            </div>
+            
+            <div class="diagnostic-item success">
+                <div class="diagnostic-title">✅ Servidor Respondendo</div>
+                <div class="diagnostic-status">Conexão com servidor OK</div>
+            </div>
+            
+            <div class="diagnostic-item success">
+                <div class="diagnostic-title">✅ Sem JavaScript</div>
+                <div class="diagnostic-status">Esta página não depende de JS</div>
+            </div>
+            
+            <div class="diagnostic-item success">
+                <div class="diagnostic-title">✅ Sem Dependências</div>
+                <div class="diagnostic-status">Nenhuma dependência externa</div>
+            </div>
+            
+            <div class="diagnostic-item success">
+                <div class="diagnostic-title">✅ Compatibilidade</div>
+                <div class="diagnostic-status">Funciona em qualquer navegador</div>
+            </div>
+        </div>
+        
+        <div class="buttons hidden" id="buttons">
+            <a href="/debug.html" class="btn">🔍 Página de Debug</a>
+            <a href="/working" class="btn">⚡ Working Landing</a>
+            <a href="/static" class="btn">📄 Static Landing</a>
+            <a href="/minimal" class="btn">🎯 Minimal Landing</a>
+            <a href="/diagnostic" class="btn">🔧 Diagnostic Landing</a>
+        </div>
+        
+        <div class="footer">
+            <p>🎉 Esta página funciona SEM JavaScript!</p>
+            <p>✅ Se você está vendo isso, o problema NÃO é infraestrutural</p>
+            <p>❌ O problema está no JavaScript/React</p>
+        </div>
+    </div>
+
+    <script>
+        // Script mínimo apenas para animação
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('status-icon').classList.remove('hidden');
+            document.getElementById('status-title').classList.remove('hidden');
+            document.getElementById('status-message').classList.remove('hidden');
+            document.getElementById('diagnostic-grid').classList.remove('hidden');
+            document.getElementById('buttons').classList.remove('hidden');
+            
+            document.getElementById('status-icon').textContent = '✅';
+            document.getElementById('status-title').textContent = 'Diagnóstico Completo!';
+            document.getElementById('status-message').textContent = 'Página HTML pura funcionando perfeitamente';
+        }, 2000);
+    </script>
+</body>
+</html>

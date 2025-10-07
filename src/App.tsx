@@ -25,6 +25,8 @@ const MinimalLanding = React.lazy(() => import('./components/MinimalLanding').th
 const StaticLanding = React.lazy(() => import('./components/StaticLanding').then(module => ({ default: module.StaticLanding })));
 // Componente que SEMPRE funciona - resolve tela branca
 const WorkingLanding = React.lazy(() => import('./components/WorkingLanding').then(module => ({ default: module.WorkingLanding })));
+// Componente de diagnóstico ULTRA - identifica QUALQUER problema
+const UltraDiagnosticLanding = React.lazy(() => import('./components/UltraDiagnosticLanding').then(module => ({ default: module.UltraDiagnosticLanding })));
 const DashboardApp = React.lazy(() => import('./pages/App'));
 const Clients = React.lazy(() => import('./pages/Clients'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -92,7 +94,8 @@ function App() {
                   <Suspense fallback={<LoadingState />}>
                     <Routes>
                   {/* Public Website Routes */}
-                  <Route path="/" element={<WorkingLanding />} />
+                  <Route path="/" element={<UltraDiagnosticLanding />} />
+                  <Route path="/working" element={<WorkingLanding />} />
                   <Route path="/static" element={<StaticLanding />} />
                   <Route path="/minimal" element={<MinimalLanding />} />
                   <Route path="/diagnostic" element={<DiagnosticLanding />} />
